@@ -17,6 +17,8 @@ then
 fi
 
 # Clear environment variables by restarting script w/bare minimum passed through
+# Environment variable NOCLEAR is used wether to pass the existing environment
+# to the script or not.
 [ -z "$NOCLEAR" ] &&
   exec env -i NOCLEAR=1 HOME="$HOME" PATH="$PATH" $(env | grep -i _proxy=) \
     CROSS_COMPILE="$CROSS_COMPILE" CROSS_SHORT="$CROSS_SHORT" "$0" "$@"
@@ -73,6 +75,9 @@ mkdir -p "$MYBUILD" "$DOWNLOAD" || exit 1
 
 ### Functions to download, extract, and clean up after source packages.
 
+# Arguments:
+# - 1   sha1sum
+# - 2   url
 # This is basically "wget $2"
 download()
 {
@@ -96,7 +101,9 @@ download()
   done
 }
 
-# This is basically "tar xvzCf $MYBUILD $DOWNLOAD/$1.tar.gz && cd $NEWDIR"
+# Arguments:
+# - 1   package name
+# This is basically "tar xvzCf $MYBUILD $DOWNLOAD/$1.tar.gz && cd $PACKAGE"
 setupfor()
 {
   # Extract source tarball (or snapshot a repo) to create disposable build dir.
@@ -116,7 +123,7 @@ setupfor()
   fi
 }
 
-# This is basically "rm -rf $NEWDIR" (remembered from setupfor)
+# This is basically "rm -rf $PACKAGE" (remembered from setupfor)
 cleanup()
 {
   # Delete directory most recent setupfor created, or exit if build failed
